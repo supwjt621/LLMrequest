@@ -1,8 +1,9 @@
 import requests
 import json
+from config import TYPHOON_API_KEY
 
 # API configuration
-token = "sk-xtB9FyvehRtukgCOl6ST8mgPWrw74mADrnhBrLvFuVaoF3dR"
+token = TYPHOON_API_KEY
 base_url = "https://api.opentyphoon.ai/v1"
 model = "typhoon-v2.5-30b-a3b-instruct"
 

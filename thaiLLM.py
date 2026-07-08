@@ -1,6 +1,7 @@
 import requests
+from config import THAI_LLM_KEY
 
-APIkey = "J26kcRT4UwCFvyXjJ2ONiCqyF1kYfO1e"
+APIkey = THAI_LLM_KEY
 URLs = "http://thaillm.or.th/api/v1/chat/completions"
 
 headers = {

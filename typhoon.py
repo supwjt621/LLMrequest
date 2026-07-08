@@ -1,7 +1,8 @@
 from openai import OpenAI
+from config import TYPHOON_API_KEY
 
 client = OpenAI(
-    api_key="sk-xtB9FyvehRtukgCOl6ST8mgPWrw74mADrnhBrLvFuVaoF3dR",
+    api_key=TYPHOON_API_KEY,
     base_url="https://api.opentyphoon.ai/v1"
 )
 
