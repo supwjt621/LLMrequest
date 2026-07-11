@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border: 1px solid #e9ecef;
+        }
+        
+        .chat-header {
+            background-color: #e6e6e6;
+            color: rgb(0, 0, 0);
+            padding: 1rem;
+            text-align: left;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1.2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #f1f1f1;
+        }
+        
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: #DCF8C6;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: #ECECEC;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 16px;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #bdbdbd;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Simple Chat Interface</div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Hello! I'm your AI assistant. How can I help you today?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your message here..." autofocus>
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Function to add a message to the chat
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = text;
+            
+            // Add to chat container
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Handle sending a message
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (text === '') return;
+            
+            // Add user message
+            addMessage(text, true);
+            
+            // Clear input field
+            userInput.value = '';
+            
+            // Simulate bot response (in a real app, this would be an API call)
+            setTimeout(() => {
+                let response = "I'm sorry, but I don't have the capability to process your request right now. Please try again later.";
+                // Simple responses based on keywords
+                if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
+                    response = "Hello there! How can I help you today?";
+                } else if (text.toLowerCase().includes('how are you')) {
+                    response = "I'm functioning well, thank you for asking! How can I assist you?";
+                } else if (text.toLowerCase().includes('thank you') || text.toLowerCase().includes('thanks')) {
+                    response = "You're welcome! Feel free to ask me anything else.";
+                } else if (text.toLowerCase().includes('bye') || text.toLowerCase().includes('goodbye')) {
+                    response = "Goodbye! Have a great day!";
+                } else if (text.toLowerCase().includes('help')) {
+                    response = "I can chat with you about various topics. Try asking me something interesting!";
+                }
+                
+                // Add bot response
+                addMessage(response, false);
+            }, 500);
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
