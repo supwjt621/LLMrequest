@@ -101,7 +101,7 @@
         }
         
         .chat-input button:hover {
-            background-color: #45a049;
+            background-color: #a7a7a7;
         }
     </style>
 </head>
@@ -139,7 +139,7 @@
         }
 
         // Handle sending a message
-        function sendMessage() {
+        async function sendMessage() {
             const text = userInput.value.trim();
             if (text === '') return;
             
@@ -148,26 +148,21 @@
             
             // Clear input field
             userInput.value = '';
+
+            const response = await fetch('http://localhost:5000/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "typhoon-v2.5-30b-a3b-instruct",
+                    messages: [{ role: "user", content: text }]
+                })
+            });
+            const data = await response.json();
             
             // Simulate bot response (in a real app, this would be an API call)
-            setTimeout(() => {
-                let response = "I'm sorry, but I don't have the capability to process your request right now. Please try again later.";
-                // Simple responses based on keywords
-                if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
-                    response = "Hello there! How can I help you today?";
-                } else if (text.toLowerCase().includes('how are you')) {
-                    response = "I'm functioning well, thank you for asking! How can I assist you?";
-                } else if (text.toLowerCase().includes('thank you') || text.toLowerCase().includes('thanks')) {
-                    response = "You're welcome! Feel free to ask me anything else.";
-                } else if (text.toLowerCase().includes('bye') || text.toLowerCase().includes('goodbye')) {
-                    response = "Goodbye! Have a great day!";
-                } else if (text.toLowerCase().includes('help')) {
-                    response = "I can chat with you about various topics. Try asking me something interesting!";
-                }
-                
-                // Add bot response
-                addMessage(response, false);
-            }, 500);
+            addMessage(data.choices[0].message.content, false);
         }
 
         // Event listeners
