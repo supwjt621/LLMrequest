@@ -129,7 +129,7 @@
         function addMessage(text, isUser) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-            messageDiv.textContent = text;
+            messageDiv.innerText = text;
             
             // Add to chat container
             chatMessages.appendChild(messageDiv);
@@ -160,9 +160,11 @@
                 })
             });
             const data = await response.json();
-            
-            // Simulate bot response (in a real app, this would be an API call)
-            addMessage(data.choices[0].message.content, false);
+            let agentmsg = data.choices[0].message.content;
+            const regex = /```.+?```/g;
+
+            const result = agentmsg.replace(regex, '<pre><code>$1</code></pre>');
+            addMessage(agentmsg, false);
         }
 
         // Event listeners
