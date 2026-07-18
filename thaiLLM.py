@@ -13,15 +13,16 @@ headers = {
 def ContinuePrompt():
     while True:
         Question = input("\nAsk anything>> ")
-        if Question == "Quit":
+        if Question.lower() == "quit":
             print("Exiting application...")
             break
 
         data = {
-            "model": "openthaigpt-thaillm-8b-instruct-v7.2",
+            "model": "thalle-0.2-thaillm-8b-fa",
             "messages": [ {"role": "user", "content": Question} ],
             "max_tokens": 2048,
             "temperature": 0.3,
+            "stream": True
         }
         
         try:
@@ -50,8 +51,8 @@ def ContinuePrompt():
 
                     if "content" in delta:
                         print(delta["content"], end="", flush=True)
-
-                    print()
+            print("\n")
+                    
         else:
             print(f"Failed with status code: {response.status_code}")
             print(response.text)
