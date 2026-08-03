@@ -1,14 +1,15 @@
 import requests
 import json
+import pandas as pd
 #from config import OLLAMA_MODEL  # you can define the model name in config.py
 
 # Ollama typically runs on http://localhost:11434
-OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
 
 def generate_ollama(prompt: str) -> str:
     """Send a prompt to Ollama and return the generated text."""
     payload = {
-        "model": "qwen3:0.6b",
+        "model": "qwen2.5:0.5b",
         "prompt": prompt,
         "stream": True,          # we want a streaming response like OpenAI
         "max_tokens": 1024,       # optional – adjust as needed
@@ -36,7 +37,6 @@ def generate_ollama(prompt: str) -> str:
 # Example usage – same prompt as before
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
-    stream_text = generate_ollama(
-        input("\nAsk anything:")
-    )
+    stream_text = generate_ollama( input("\nAsk anything:") )
+
     # If you need a final newline or any post‑processing, do it here.
