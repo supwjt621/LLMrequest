@@ -3,6 +3,8 @@ from google import genai
 from google.genai import types
 from config import GEMINI_API_KEY
 import pandas as pd
+import time
+from datetime import datetime
 
 api_key = GEMINI_API_KEY
 
@@ -15,21 +17,22 @@ systemPrompt = """คุณคือเภสัชกรผู้เชีย�
 * Administration Error เป็นความคลาดเคลื่อนในการบริหารยาโดยพยาบาล
 ซึ่งรายงานความเสี่ยงแต่ละอุบัติการณ์ สามารถเกิดความคลาดเคลื่อนได้มากกว่า 1 ประเภท ทำให้การจัดประเภทในแต่ละอุบัติการณ์ สามารถตอบได้มากกว่า 1 ประเภท
 ##ตัวอย่างเหตุการณ์ความเสี่ยง 
-Input: เภสัชกรจ่ายยาผิดชื่อยาไปยังหอผู้ป่วย
-Rationale: เนื่องจาก เภสัชกรเป็นผู้จ่ายยา แต่ยาที่จ่ายออกมามีชื่อไม่ตรงกับคำสั่งใช้ยาของแพทย์ ซึ่งเมื่อยาจ่ายออกไปที่หอผู้ป่วย พยาบาลเป็นผู้ตรวจสอบพบคลาดเคลื่อนนี้
-Output: Dispensing Error
-Input: ไม่ได้สั่งยาเดิม metformin ให้ผู้ป่วยกลับบ้าน
-Rationale: เดิมผู้ป่วยมียารักษาโรคประจำตัว แต่แพทย์ไม่ได้สั่งใช้ยาเหล่านี้ต่อในวันกลับบ้าน จึงถือเป็นความผิดพลาดจากการสั่งใช้ยาของแพทย์
-Output: Prescribing Error
-##Output Rules: ให้ตอบเป็นข้อความธรรมดา โดยตอบเฉพาะชื่อหมวดหมู่ที่กำหนด พร้อมเหตุผลสั้น ๆ 1 บรรทัด ทั้งนี้ อาจตอบได้มากกว่า 1 หมวดหมู่ก็ได้
+1. Input: เภสัชกรจ่ายยาผิดชื่อยาไปยังหอผู้ป่วย
+* Rationale: เนื่องจาก เภสัชกรเป็นผู้จ่ายยา แต่ยาที่จ่ายออกมามีชื่อไม่ตรงกับคำสั่งใช้ยาของแพทย์ ซึ่งเมื่อยาจ่ายออกไปที่หอผู้ป่วย พยาบาลเป็นผู้ตรวจสอบพบคลาดเคลื่อนนี้
+* Output: Dispensing Error
+2. Input: ไม่ได้สั่งยาเดิม metformin ให้ผู้ป่วยกลับบ้าน
+* Rationale: เดิมผู้ป่วยมียารักษาโรคประจำตัว แต่แพทย์ไม่ได้สั่งใช้ยาเหล่านี้ต่อในวันกลับบ้าน จึงถือเป็นความผิดพลาดจากการสั่งใช้ยาของแพทย์
+* Output: Prescribing Error
+##Output Rules: ให้ตอบเป็นข้อความธรรมดา โดยตอบเฉพาะชื่อหมวดหมู่ที่กำหนดเท่านั้น ทั้งนี้ อาจตอบได้มากกว่า 1 หมวดหมู่ก็ได้แต่ให้คั่นด้วยเครื่องหมาย comma เท่านั้น
 คำตอบที่อนุญาต: 'Prescribing Error', 'Transcribing Error', 'Predispensing Error', 'Dispensing Error', 'Administration Error'
-ห้าม: ใส่หมายเลข, ใส่เครื่องหมายคำพูด
+ห้าม: ใส่หมายเลข, ใส่เครื่องหมายคำพูด, อธิบายเพิ่มเติม
 ##จงจัดประเภทรายงานความเสี่ยงต่อไปนี้ โดยตอบเฉพาะประเภทความคลาดเคลื่อนที่กำหนดเท่านั้น
+Input:
 """
 
-
 df = pd.read_csv('Raw-50.csv')
-dataset = df['รายละเอียด'].values      
+dataset = df['รายละเอียด'].values     
+codeSet = df['รหัสรายงาน'].values
 
 
 if not api_key:
@@ -37,36 +40,47 @@ if not api_key:
 
 # Set the API key
 os.environ["GEMINI_API_KEY"] = api_key
-
 os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client()
 
-with open("alteplase.md", "r") as f:
-    file_content = f.read()
-
 # 1. Define the Specialist Persona and Rules
 system_prompt = systemPrompt
+counter = 10
+model_name = "gemini-3.5-flash-lite"
 
-# 2. Send the Request
-# We include the system_instruction in the config
-interaction = client.models.generate_content_stream(
-    model="gemini-3.5-flash",
-    contents=[
-        {"role": "user", "parts": [{"text": "Input:" + dataset[3] + "\nOutput:"}]},
-        #{"role": "user", "parts": [{"text": f"Reference Data:\n{file_content}"}]}
-    ],
-    config=types.GenerateContentConfig(
-        system_instruction=system_prompt,
-        response_mime_type="application/json" # Ensures strict JSON output
-    )
-)
+def makeRequest():
+    ansSet = []
+    
+    for i in range(10):
+        interaction = client.models.generate_content_stream(
+            model=model_name,
+            contents=[
+                {"role": "user", "parts": [{"text": "Input:" + dataset[i] + "\nOutput:"}]},
+                #{"role": "user", "parts": [{"text": f"Reference Data:\n{file_content}"}]}
+            ],
+            config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                response_mime_type="application/json" # Ensures strict JSON output
+            )
+        )
+        print("\n" + dataset[i])
+        fullResp = ""
+        # 3. Process the Response
+        for i, chunk in enumerate(interaction, 1):
+            fullResp += chunk.text
+            print(chunk.text, end="", flush=True)   # live output
+            # optionally process chunk here...
+        ansSet.append(fullResp)
 
-print(dataset[3])
+    data_export = pd.DataFrame({
+        'รหัสรายงาน': codeSet[:counter],
+        'รายละเอียด': dataset[:counter],
+        'คำตอบ': ansSet
+    })
+    nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
+    data_export.to_csv(model_name + '_' + nows + '.csv', index=False, encoding='utf-8-sig')
+    print("\nExported to " + model_name + '_' + nows + '.csv')
 
-# 3. Process the Response
-for i, chunk in enumerate(interaction, 1):
-    print(chunk.text, end="", flush=True)   # live output
-    # optionally process chunk here...
-print()  # newline after the loop ends
-
+if __name__ == "__main__":
+    makeRequest()
