@@ -1,12 +1,14 @@
 from openai import OpenAI
 from config import TYPHOON_API_KEY
+from config import LOCAL_OLLAMA_URL
+from config import LOCAL_OLLAMA_APIKEY
 import pandas as pd
 import time
 from datetime import datetime
 
 client = OpenAI(
-    api_key=TYPHOON_API_KEY,
-    base_url="https://api.opentyphoon.ai/v1"
+    api_key=LOCAL_OLLAMA_APIKEY,
+    base_url=LOCAL_OLLAMA_URL
 )
 
 sys_prompt = """คุณคือเภสัชกรผู้เชียวชาญด้านระบบยาประจำโรงพยาบาลศูนย์แห่งหนึ่ง 
@@ -51,10 +53,10 @@ def ContChat():
         ]
 
         stream = client.chat.completions.create(
-            model="typhoon-v2.5-30b-a3b-instruct",
+            model="qwen3.6:27b",
             messages=messages,
             temperature=0.6,
-            max_completion_tokens=512,
+            max_completion_tokens=4096,
             top_p=0.6,
             frequency_penalty=0,
             stream=True

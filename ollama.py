@@ -3,6 +3,9 @@ import json
 import pandas as pd
 import time
 from datetime import datetime
+from config import LOCAL_OLLAMA_URL
+from config import LOCAL_OLLAMA_MODEL
+from config import LOCAL_OLLAMA_APIKEY
 #from config import OLLAMA_MODEL  # you can define the model name in config.py
 
 system_prompt = """คุณคือเภสัชกรผู้เชียวชาญด้านระบบยาประจำโรงพยาบาลศูนย์แห่งหนึ่ง 
@@ -28,9 +31,13 @@ Input:
 """
 
 # Ollama typically runs on http://localhost:11434
-OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
-model_name = "qwen3:0.6b"
-counter = 10
+#OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
+#model_name = "qwen3:0.6b"
+
+OLLAMA_URL = LOCAL_OLLAMA_URL
+model_name = LOCAL_OLLAMA_MODEL
+API_KEY = LOCAL_OLLAMA_APIKEY
+counter = 2
 
 def readFile() -> str:
     df = pd.read_csv('Raw-50.csv')
