@@ -30,7 +30,7 @@ systemPrompt = """คุณคือเภสัชกรผู้เชีย�
 Input:
 """
 
-df = pd.read_csv('Raw-50.csv')
+df = pd.read_csv('./Assets/Raw-50.csv')
 dataset = df['รายละเอียด'].values     
 codeSet = df['รหัสรายงาน'].values
 
@@ -79,8 +79,8 @@ def makeRequest():
         'คำตอบ': ansSet
     })
     nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
-    data_export.to_csv(model_name + '_' + nows + '.csv', index=False, encoding='utf-8-sig')
-    print("\nExported to " + model_name + '_' + nows + '.csv')
+    data_export.to_csv(f"Assets/{model_name} + '_' + {nows} + '.csv", index=False, encoding='utf-8-sig')
+    print(f"\nExported to ./Assets/{model_name} + '_' + {nows} + '.csv")
 
 if __name__ == "__main__":
     makeRequest()
