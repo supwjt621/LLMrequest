@@ -12,9 +12,10 @@ headers = {
 
 sys_prompt = ""
 
-with open("Assets/sys_prompt_v2.md", "r", encoding="utf-8") as file:
+with open("Prompts/sys_prompt_v2.md", "r", encoding="utf-8") as file:
     sys_prompt = file.read()
 
+print(len(sys_prompt))
 
 def ContinuePrompt():
     while True:
