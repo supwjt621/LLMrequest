@@ -7,20 +7,55 @@ from datetime import datetime
 
 #from config import OLLAMA_MODEL  # you can define the model name in config.py
 script_dir = os.path.dirname(os.path.abspath(__file__))
-md_path = os.path.join(script_dir, "..", "Prompts", "sys_prompt_v3.md")
+md_path = os.path.join(script_dir, "..", "Prompts", "sys_prompt_v4.md")
+usr_path = os.path.join(script_dir, "..", "Prompts", "user_prompt.md")
 
-system_prompt = ""
+system_prompt1 = system_prompt2 = ""
+user_prompt1 = user_prompt2 = ""
 
 with open(md_path, "r", encoding="utf-8") as file:
-    system_prompt = file.read()
+    system_prompt = file.readlines()
+
+ExtractPart = 0
+for line in system_prompt:
+    if line.startswith("# End") and ExtractPart != 0:
+        ExtractPart = 0
+    elif line.startswith("# Prompt_1") or ExtractPart == 1:
+        ExtractPart = 1
+        system_prompt1 += line.strip()
+    elif line.startswith("# Prompt_2") or ExtractPart == 2:
+        ExtractPart = 2
+        system_prompt2 += line.strip()
+
+system_prompt1 = system_prompt1.replace("# Prompt_1", "")
+system_prompt2 = system_prompt2.replace("# Prompt_2", "")
+
+
+with open(usr_path, "r", encoding="utf-8") as file:
+    user_prompt = file.readlines()
+
+ExtractPart = 0
+for line in user_prompt:
+    if line.startswith("# End") and ExtractPart != 0:
+        ExtractPart = 0
+    elif line.startswith("# Prompt_1") or ExtractPart == 1:
+        ExtractPart = 1
+        user_prompt1 += line.strip()
+    elif line.startswith("# Prompt_2") or ExtractPart == 2:
+        ExtractPart = 2
+        user_prompt2 += line.strip()
+
+user_prompt1 = user_prompt1.replace("# Prompt_1", "")
+user_prompt2 = user_prompt2.replace("# Prompt_2", "")
+
 
 # Ollama typically runs on http://localhost:11434
-#OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
+OLLAMA_URL = "http://192.168.1.120:11434/api/chat"
 model_name = "qwen3:0.6b"
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
+#OLLAMA_URL = "http://localhost:11434/api/generate"
 
-counter = 2
+counter = 1
 
 def readFile() -> str:
     df = pd.read_csv('Assets/Raw-50.csv')
@@ -30,9 +65,13 @@ def readFile() -> str:
 
     for i in range(counter):
         print("\n" + dataset[i])
-        result = generate_ollama(system_prompt + "จงจำแนกประเภทของอุบัติการณ์ความเสี่ยงดังต่อไปนี้" + dataset[i])
-        ansSet.append(result)
+        result = generate_ollama(system_prompt1, user_prompt1 + dataset[i] + "\nOutput:")
+        #result = generate_ollama("test")
+        #ansSet.append(result)
         #print(result)
+        
+        prompt2 = user_prompt2 + "Input Data: Incident text: " + dataset[i] + ", Core Facts from Step 1: " + result + "\nOutput: "
+        result2 = generate_ollama(system_prompt2, prompt2)
 
     '''
     nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
@@ -48,11 +87,14 @@ def readFile() -> str:
 #End readFile def
 
 
-def generate_ollama(prompt: str) -> str:
+def generate_ollama(syst_prompt: str, prompt: str) -> str:
     """Send a prompt to Ollama and return the generated text."""
     payload = {
         "model": model_name,
-        "prompt": prompt,
+        "messages" : [
+            { "role": "user", "content": prompt },
+            { "role": "system", "content": syst_prompt }
+        ],
         "stream": True,          # we want a streaming response like OpenAI
         "max_tokens": 8192,       # optional – adjust as needed
         "think": False
@@ -68,11 +110,12 @@ def generate_ollama(prompt: str) -> str:
             # The actual JSON payload is after the "data:" prefix
             json_part = line
             if json_part:
-                chunk = json.loads(json_part)
+                chunk = json.loads(json_part.decode("utf-8"))
                 # The text chunk is usually under `response` -> "message" -> "content"
-                chunk_text = chunk.get("response", "")
+                chunk_text = chunk.get("message", {}).get("content", "")
                 print(chunk_text, end="", flush=True)
                 generated += chunk_text
+    print("\n")
     return generated
 #End def
 
