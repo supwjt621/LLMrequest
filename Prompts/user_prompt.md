@@ -1,5 +1,4 @@
 # Prompt_1
-
 Extract core medication error details from the incident text below following this JSON schema:
 Schema:
 {
@@ -37,7 +36,6 @@ Output:
 # End
 
 # Prompt_2
-
 Analyze the incident text and core facts below, then extract the outcome and context details following this JSON schema:
 Schema:
 {
@@ -95,12 +93,5 @@ Output:
   "ddi_present": false,
   "harm_occurred": false
 }
-
-### Input Data:
-Incident Text: "{{INCIDENT_TEXT_WITH_TAGS}}"
-Core Facts from Step 1:
-{{STEP_1_JSON_RESULT}}
-
-Output:
 
 # End

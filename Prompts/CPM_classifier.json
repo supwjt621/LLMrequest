@@ -1,0 +1,554 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "domain": "Medication Incident Classification",
+  "rules": [
+    {
+      "cpm_id": "CPM101",
+      "name": "Repeat Drug Allergy",
+      "category": "CPM1xx — Adverse Events",
+      "description": "ผู้ป่วยได้รับยาที่มีประวัติการแพ้ยาซ้ำ โดยต้องมีการส่งผ่านความคลาดเคลื่อนไปถึงผู้ป่วยและผู้ป่วยได้รับยาจริง",
+      "priority": 20,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "patient.has_previous_drug_allergy",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.is_previous_allergen",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาที่มีประวัติแพ้ซ้ำจริง โดยความคลาดเคลื่อนส่งผ่านไปถึงผู้ป่วย"
+    },
+    {
+      "cpm_id": "CPM102",
+      "name": "No or Non-compliance with High Alert Drug Guideline",
+      "category": "CPM1xx — Adverse Events",
+      "description": "มีการใช้ High Alert Drug โดยไม่มีแนวทางที่กำหนดไว้ หรือมีแนวทางแต่ผู้เกี่ยวข้องไม่ปฏิบัติตามข้อกำหนดด้านการสั่ง การเตรียม การตรวจสอบ การบริหาร หรือการเฝ้าระวัง",
+      "priority": 10,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.high_alert_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "guideline.non_compliance",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเป็น High Alert Drug และพบการไม่มีหรือไม่ปฏิบัติตามแนวทางความปลอดภัยของ HAD"
+    },
+    {
+      "cpm_id": "CPM103",
+      "name": "Preventable Complication from High Alert Drug",
+      "category": "CPM1xx — Adverse Events",
+      "description": "ผู้ป่วยเกิดอาการไม่พึงประสงค์ ภาวะแทรกซ้อน หรืออันตรายจากการได้รับ High Alert Drug และเหตุการณ์นั้นมีสาเหตุที่สามารถป้องกันได้",
+      "priority": 30,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.high_alert_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_harm_occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.harm_preventable",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับ High Alert Drug จริงและเกิดภาวะแทรกซ้อนหรืออันตรายที่สามารถป้องกันได้"
+    },
+    {
+      "cpm_id": "CPM104",
+      "name": "Mis-selection of a strong potassium containing solution",
+      "category": "CPM1xx — Adverse Events",
+      "description": "การเลือกสารละลายโพแทสเซียมความเข้มข้นสูงหรือ concentrated potassium solution ผิดจากที่ควรใช้ ไม่ว่าจะตรวจพบก่อนหรือหลังผู้ป่วยได้รับยา",
+      "priority": 25,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.is_concentrated_potassium",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.is_product_selection_error",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.potassium_selection_is_wrong",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเกิดการเลือกสารละลายโพแทสเซียมเข้มข้นผิดชนิดหรือผิดความเข้มข้น"
+    },
+    {
+      "cpm_id": "CPM105",
+      "name": "Drug Allergy or Adverse Drug Event Severity E or Higher",
+      "category": "CPM1xx — Adverse Events",
+      "description": "ผู้ป่วยเกิดอาการแพ้ยาที่ไม่ใช่กรณีแพ้ยาซ้ำ หรือเกิด Adverse Drug Event ที่มีความรุนแรงระดับ E ขึ้นไป",
+      "priority": 15,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_harm_occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.severity",
+            "operator": "in",
+            "value": [
+              "E",
+              "F",
+              "G",
+              "H",
+              "I"
+            ]
+          }
+        ],
+        "none_of": [
+          {
+            "fact_path": "patient.has_previous_drug_allergy",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.is_previous_allergen",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาและเกิด ADE หรืออาการแพ้ยาที่มีความรุนแรงระดับ E ขึ้นไป โดยไม่ใช่กรณีแพ้ยาซ้ำ"
+    },
+    {
+      "cpm_id": "CPM106",
+      "name": "Non-compliance with Fatal Drug Guideline",
+      "category": "CPM1xx — Adverse Events",
+      "description": "มีการสั่ง เตรียม จ่าย หรือบริหาร Fatal Drug โดยไม่ปฏิบัติตามแนวทางหรือมาตรการความปลอดภัยที่องค์กรกำหนด",
+      "priority": 12,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.fatal_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "guideline.non_compliance",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเป็น Fatal Drug และพบการไม่ปฏิบัติตามแนวทางหรือมาตรการความปลอดภัยที่กำหนด"
+    },
+    {
+      "cpm_id": "CPM107",
+      "name": "Severe Drug-Drug Interaction",
+      "category": "CPM1xx — Adverse Events",
+      "description": "ผู้ป่วยได้รับยาตั้งแต่ 2 ชนิดขึ้นไปที่มี Drug-Drug Interaction ระดับรุนแรงหรือมีความสำคัญทางคลินิก",
+      "priority": 10,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "interaction.ddi_present",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "interaction.severity",
+            "operator": "in",
+            "value": [
+              "severe",
+              "contraindicated",
+              "high"
+            ]
+          }
+        ],
+        "none_of": [
+          {
+            "fact_path": "medication_reconciliation.interaction_due_to_med_rec",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาที่มี DDI ระดับรุนแรงหรือมีความสำคัญทางคลินิกจริง และไม่ได้มีสาเหตุหลักจาก Medication Reconciliation"
+    },
+    {
+      "cpm_id": "CPM201",
+      "name": "Prescribing Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ความคลาดเคลื่อนที่เกิดขึ้นในขั้นตอนการสั่งใช้ยา เช่น สั่งยาผิดชนิด ข้อบ่งใช้ ขนาด ความถี่ วิธีให้ ระยะเวลา หรือสั่งยาเมื่อผู้ป่วยมีข้อห้ามใช้หรือแพ้ยา",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "prescribing"
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากความคลาดเคลื่อนเกิดขึ้นในขั้นตอน Prescribing หรือการสั่งใช้ยา"
+    },
+    {
+      "cpm_id": "CPM202",
+      "name": "Transcribing Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ความคลาดเคลื่อนที่เกิดขึ้นในขั้นตอนการถ่ายทอดหรือคัดลอกคำสั่งยาจากแหล่งข้อมูลหนึ่งไปยังอีกแหล่งหนึ่ง",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "transcribing"
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากคำสั่งยาถูกต้องจากต้นทาง แต่เกิดความคลาดเคลื่อนในขั้นตอนการถ่ายทอดหรือคัดลอกคำสั่งยา"
+    },
+    {
+      "cpm_id": "CPM203",
+      "name": "Pre-dispensing Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ความคลาดเคลื่อนที่เกิดขึ้นในขั้นตอนการเตรียมและจัดยาก่อนการจ่ายหรือส่งมอบยา เช่น การคัดเลือกยา การคำนวณ การเตรียม การแบ่งบรรจุ การติดฉลาก หรือการตรวจสอบก่อนจ่าย",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "pre_dispensing"
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": false
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากพบ Error ในขั้นตอน Pre-dispensing และยาที่ยังผิดพลาดยังไม่ถูกจ่ายหรือส่งมอบออกจากหน่วยจ่ายยา"
+    },
+    {
+      "cpm_id": "CPM204",
+      "name": "Dispensing Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ความคลาดเคลื่อนในขั้นตอนการจ่ายและส่งมอบยา ทำให้ยาหรือข้อมูลที่ส่งมอบไม่ตรงตามคำสั่งที่ถูกต้อง",
+      "priority": 7,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "dispensing"
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากความคลาดเคลื่อนเกิดในขั้นตอน Dispensing และยาหรือข้อมูลที่ผิดถูกส่งมอบออกไปแล้ว"
+    },
+    {
+      "cpm_id": "CPM205",
+      "name": "Administration Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ความคลาดเคลื่อนที่เกิดขึ้นในขั้นตอนการบริหารยาให้ผู้ป่วย เช่น ผิดผู้ป่วย ผิดยา ผิดขนาด ผิดเวลา ผิดวิธีหรือทางให้ยา หรือไม่ได้ให้ยาตามคำสั่งโดยไม่มีเหตุผลที่เหมาะสม",
+      "priority": 7,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "administration"
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากความคลาดเคลื่อนเกิดขึ้นในขั้นตอน Administration หรือการบริหารยาให้ผู้ป่วย"
+    },
+    {
+      "cpm_id": "CPM206",
+      "name": "No or Non-compliance with LASA Medication Guideline",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ไม่มีแนวทางหรือไม่ปฏิบัติตามมาตรการป้องกันความคลาดเคลื่อนจาก Look-Alike Sound-Alike Medication Names เช่น การแยกจัดเก็บ Tall Man Lettering สัญลักษณ์เตือน หรือการตรวจสอบชื่อยา",
+      "priority": 10,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.lasa_medication",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "guideline.lasa_guideline_missing_or_not_followed",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเกี่ยวข้องกับยา LASA และพบว่าแนวทางหรือมาตรการป้องกัน LASA ไม่มีหรือไม่ได้รับการปฏิบัติตาม"
+    },
+    {
+      "cpm_id": "CPM207",
+      "name": "Patient Received Look-Alike Sound-Alike Medication",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ผู้ป่วยได้รับยาที่อยู่ในกลุ่ม LASA ผิดจากยาที่ควรได้รับ เนื่องจากชื่อหรือรูปลักษณ์ของยามีความคล้ายคลึงกัน",
+      "priority": 20,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.lasa_medication",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.lasa_caused_wrong_medication",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาผิดจากยาที่ควรได้รับจริง และสาเหตุเกี่ยวข้องกับความคล้ายคลึงของชื่อหรือรูปลักษณ์ยาแบบ LASA"
+    },
+    {
+      "cpm_id": "CPM208",
+      "name": "No or Non-compliance with General Medication Use Guideline",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ไม่มีมาตรฐานหรือแนวทาง หรือมีมาตรฐานแต่ไม่ปฏิบัติตามเกี่ยวกับการใช้ยา โดยไม่รวม High Alert Drug, Fatal Drug, LASA และ Antibiotics",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "guideline.general_medication_guideline_missing_or_not_followed",
+            "operator": "equals",
+            "value": true
+          }
+        ],
+        "none_of": [
+          {
+            "fact_path": "drug.high_alert_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.fatal_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.lasa_medication",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.antibiotic",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากไม่ปฏิบัติตามแนวทางการใช้ยาทั่วไป และยาไม่อยู่ในกลุ่ม HAD, Fatal Drug, LASA หรือ Antibiotic"
+    },
+    {
+      "cpm_id": "CPM301",
+      "name": "No or Non-compliance with Medication Reconciliation Guideline",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ไม่มีแนวทางหรือไม่ปฏิบัติตามกระบวนการ Medication Reconciliation ในช่วงเวลาที่กำหนด เช่น การรวบรวม ตรวจสอบ เปรียบเทียบ และส่งต่อรายการยาเดิมของผู้ป่วย",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.guideline_missing_or_not_followed",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากพบว่าไม่มีหรือไม่ปฏิบัติตามกระบวนการ Medication Reconciliation ที่ควรดำเนินการ"
+    },
+    {
+      "cpm_id": "CPM302",
+      "name": "Medication Reconciliation Omission Error",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ผู้ป่วยไม่ได้รับยาเดิมต่อเนื่อง หรือยาเดิมถูกหยุด ตกหล่น หรือไม่ได้สั่งต่อ เนื่องจากความล้มเหลวของ Medication Reconciliation",
+      "priority": 15,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.failure",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.omission",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_did_not_receive_previous_medication",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากความล้มเหลวของ Medication Reconciliation ส่งผลให้ผู้ป่วยไม่ได้รับยาเดิมต่อเนื่องจริง"
+    },
+    {
+      "cpm_id": "CPM303",
+      "name": "Medication Reconciliation Duplication Error",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ผู้ป่วยได้รับยาที่มีตัวยาเดียวกันหรือมีฤทธิ์ทางการรักษาซ้ำซ้อนโดยไม่เหมาะสม เนื่องจากไม่ได้ทำ Medication Reconciliation อย่างถูกต้อง",
+      "priority": 15,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.failure",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.duplication",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_received_duplicate_medication",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากความล้มเหลวของ Medication Reconciliation ส่งผลให้ผู้ป่วยได้รับยาที่ซ้ำซ้อนจริง"
+    },
+    {
+      "cpm_id": "CPM304",
+      "name": "Medication Reconciliation Interaction Error",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ผู้ป่วยได้รับยาที่มี Drug-Drug Interaction โดยมีสาเหตุหลักจากความล้มเหลวของ Medication Reconciliation ทำให้ไม่ทราบรายการยาเดิมของผู้ป่วย",
+      "priority": 20,
+      "overrides": [
+        "CPM107"
+      ],
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.failure",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.interaction_due_to_med_rec",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "interaction.ddi_present",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาที่มี DDI จริง และสาเหตุหลักของ DDI มาจากความล้มเหลวของ Medication Reconciliation จึงมี Priority สูงกว่า CPM107"
+    }
+  ]
+}
