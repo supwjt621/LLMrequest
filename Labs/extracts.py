@@ -20,7 +20,7 @@ model_name = "qwen3:0.6b"
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
-counter = 5
+counter = 2
 
 def readFile() -> str:
     df = pd.read_csv('Assets/Raw-50.csv')
@@ -30,10 +30,11 @@ def readFile() -> str:
 
     for i in range(counter):
         print("\n" + dataset[i])
-        result = AskOllama(system_prompt + "จงจำแนกประเภทของอุบัติการณ์ความเสี่ยงดังต่อไปนี้" + dataset[i])
+        result = generate_ollama(system_prompt + "จงจำแนกประเภทของอุบัติการณ์ความเสี่ยงดังต่อไปนี้" + dataset[i])
         ansSet.append(result)
-        print(result)
+        #print(result)
 
+    '''
     nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
     df_set = pd.DataFrame({
         'รหัสรายงาน' : repcode[:counter],
@@ -42,6 +43,7 @@ def readFile() -> str:
     })
     df_set.to_csv(f"Result_log/{model_name.replace(":", "-")}_{nows}.csv", index=False, encoding='utf-8-sig')
     print('\nExported to '+ model_name.replace(":", "-") + '_' + nows + '.csv')
+    '''
 
 #End readFile def
 
@@ -53,7 +55,7 @@ def generate_ollama(prompt: str) -> str:
         "prompt": prompt,
         "stream": True,          # we want a streaming response like OpenAI
         "max_tokens": 8192,       # optional – adjust as needed
-        "think": True
+        "think": False
     }
 
     response = requests.post(OLLAMA_URL, json=payload, stream=True)
