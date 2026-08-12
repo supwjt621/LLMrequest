@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "domain": "Medication Incident Classification",
+  "rules": [
+    {
+      "cpm_id": "CPM104",
+      "name": "Mis-selection of a strong potassium containing solution",
+      "category": "CPM1xx — Adverse Events",
+      "description": "การเลือกหรือหยิบยาผสมโปแตสเซียมเข้มข้นผิดพลาด ไม่ว่าจะส่งถึงผู้ป่วยหรือไม่ก็ตาม",
+      "priority": 10,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "drug.high_alert_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "drug.is_concentrated_potassium",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.is_product_selection_error",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเป็นสารละลาย Potassium เข้มข้น และเกิดข้อผิดพลาดในการเลือก/หยิบผลิตภัณฑ์"
+    },
+    {
+      "cpm_id": "CPM107",
+      "name": "Severe Drug-Drug Interaction",
+      "category": "CPM1xx — Adverse Events",
+      "description": "ผู้ป่วยได้รับยาที่มี Drug-Drug Interaction รุนแรง",
+      "priority": 5,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "event.patient_received_drug",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "interaction.ddi_present",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "interaction.severity",
+            "operator": "in",
+            "value": ["severe", "contraindicated", "high"]
+          }
+        ],
+        "none_of": [
+          {
+            "fact_path": "medication_reconciliation.interaction_due_to_med_rec",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากผู้ป่วยได้รับยาจริง และพบ DDI ระดับรุนแรง โดยไม่ได้เกิดจากกระบวนการ Med Rec"
+    },
+    {
+      "cpm_id": "CPM203",
+      "name": "Pre-dispensing Error",
+      "category": "CPM2xx — Medication Errors",
+      "description": "ข้อผิดพลาดเกิดขึ้นในขั้นตอนการจัดยา/เตรียมยาก่อนการส่งมอบ",
+      "priority": 1,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "error.occurred",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "error.stage",
+            "operator": "equals",
+            "value": "pre_dispensing"
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากพบ Error เกิดขึ้นในขั้นตอน Pre-dispensing"
+    },
+    {
+      "cpm_id": "CPM302",
+      "name": "Medication Reconciliation Omission Error",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ผู้ป่วยไม่ได้รับยาเดิมต่อเนื่องอันเนื่องมาจากการล้มเหลวของกระบวนการ Med Rec",
+      "priority": 10,
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.failure",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.omission",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากมีความล้มเหลวในกระบวนการ Med Rec และส่งผลให้เกิดการละเลยยาเดิม (Omission)"
+    },
+    {
+      "cpm_id": "CPM304",
+      "name": "Medication Reconciliation Interaction Error",
+      "category": "CPM3xx — Medication Reconciliation",
+      "description": "ผู้ป่วยได้รับยาที่มีปฏิกิริยากัน โดยมีสาเหตุหลักมาจากการล้มเหลวของ Med Rec",
+      "priority": 15,
+      "overrides": ["CPM107"],
+      "conditions": {
+        "all_of": [
+          {
+            "fact_path": "medication_reconciliation.involved",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.failure",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "fact_path": "medication_reconciliation.interaction_due_to_med_rec",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "audit_template": "แมตช์เนื่องจากเกิด DDI จากความล้มเหลวในกระบวนการ Med Rec (มี Priority สูงกว่า CPM107)"
+    }
+  ]
+}
