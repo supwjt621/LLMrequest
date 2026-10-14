@@ -1,0 +1,86 @@
+﻿รหัสรายงาน,รายละเอียด,คำตอบ
+2507000441,ผู้ป่วยแพ้ยา แพทย์สั่งยาแต่ไม่ใช้ Doctor order sheet แพ้ยา,"[""Prescribing Error""]"
+2509000086,ส่งเบิกยาตาม order ยาพ่น Adrenline (1:1000) 1.5 ml + 3% Nacl up to 4 ml พ่น ทุก 6 ้hr ไ้รับยา Adrenline มา 4 Amp โทรประสานห้องยา จ่ายยา ไม่ครบ กับการพ่นยา ใน 24 hr ห้องยารับทราบ ให้มารับยาเพิ่มอีก 4 Amp ที่ห้องยาได้เลย,"{
+  ""classification"": ""Predispensing Error, Dispensing Error""
+}"
+2507001027,886960 ด.ช. 6ปี10ด. แพทย์สั่งยา paracetamol 325 mg oral prn q 4-6 hr ห้องยาคีย์ยาในใบ MAR เป็น paracetamol 500 mg oral prn q 4-6 hr แต่จ่ายยาขนาด 325 mg /1234,"[""Transcribing Error"", ""Dispensing Error""]"
+2507000580,ผู้ป่วย CFx. Rt.humerus แพ้ยากลุ่ม Penicillin แพทย์จำหน่าย สั่งยา HM เป็น Dicloxacillin 1x4 po ac,"[""Prescribing Error""]"
+2507000418,ผู้ป่วย HN 706830 แพทย์มีคำสั่ง tramol 1x2 pc ของเดิม วันที่ 10 แพทย์ มีคำสั่ง tramol 1xprn 8 hr แต่ไม่ได้มี order off ของเดิม ในใบลงยา off ยาไป แต่ห้องยายังจ่าง tramol 1x2 มาทุกวัน และจ่าย tramol 1xprn ด้วย,"[
+  ""Prescribing Error"",
+  ""Transcribing Error"",
+  ""Dispensing Error""
+]"
+2504000187,"มารดาG4P2A1 GA 28+1wk by U/S แพทย์เขียน order Ferrous Fumarate 1*1po pc, Triferdine 1*1 po pc Calcium 1*1po pc พยาบาลรับคำสั่งใบ order ส่งเบิกยาที่ห้องยา ขณะพยาบาลตรวจสอบยาในระบบคอม และพิมพ์สติกเกอร์ยาพบว่ายาทั้ง 3 ตัว เภสัชได้ระบุเวลาให้ยาเป็นเวลาเดียวกัน พยาบาลรายงานแพทย์ ปรับยาเป็น Ferrous Fumarate 1*1po pc เย็น Triferdine 1*1 po pc เช้า Calcium 1*1po pc เที่ยง โทรประสานกับเภสัชห้องยาอีกครั้ง เพื่อแก้ไขเวลาให้ถูกต้อง","{
+  ""Output"": ""Prescribing Error, Transcribing Error""
+}"
+2504001013,แพทย์สั่งยา Lasix 20 mg iv stat. ฉีดยาให้ผู้ป่วยเป็น lasix 40 mg,"[
+  ""Prescribing Error"",
+  ""Administration Error""
+]"
+2103000779,แพทย์สั่ง NaHCO3 แต่ห้องยาจ่าย NaCl,"[""Prescribing Error"", ""Dispensing Error""]"
+2509000808,แพทย์สั่งจ่ายยา Gabapentin(100) จพ.เภสัชกรรมเช็คยาผิดชื่อเป็น Simvastatin(20),"{
+  ""error_types"": ""Predispensing Error, Dispensing Error""
+}"
+2505000954,868163 ผู้ป่วย case cellulitis at back ผู้ป่วยมี U/D DLP แพทย์มีแผนการรักษาสั่งยาเดิมผู้ป่วยคือ atorvastatin 10 mg 1 tab oral hs ห้องยา คีย์ยาและจ่ายยาเป็น atorvastatin 40 mg 1 tab oral hs (003),"[
+  ""Transcribing Error"",
+  ""Predispensing Error"",
+  ""Dispensing Error""
+]"
+2507000571,ผู้ป่วยหญิงอายุ 77 ปีหลัง post -op มี order ยา Morphine 3 mg iv q 4 hr และ Plasil 10 mg iv q 6 hr แต่ห้องยาจ่ายยาเป็น ยา Morphine 3 mg iv prn q 4 hr และ Plasil 10 mg iv prn q 6 hr,"{
+  ""classification"": ""Transcribing Error, Dispensing Error""
+}"
+2508000237,สั่งยาเดียวกัน 2 แผนกและวิธีใช้ไม่เหมือนกัน/order HM glipizide 5 mg 2x2 และ glipizide 5 mg 1x1,"[""Prescribing Error""]"
+2504000988,Carbocysteine ไม่มีการสั่งใช้ คัดลอกยาเกิน ได้รับยา 1 Dose,"[""Prescribing Error"", ""Transcribing Error"", ""Dispensing Error"", ""Administration Error""]"
+2412000818,413544 รับย้ายจาก ICU Sx ขณะตรวจสอบยา พบว่า แพทย์ order ยา Clexane 60 mg SC OD start วันที 7/12/67 รับย้ายมา ศญ วันทีี 9/12/67 พบว่า Order ไม่ตรงกับ dose ที่ฉีด และห้องยาจ่าย clexane 40 mg ในใบ MAR ICU sx ลงชื่อฉีดยา Clexane 40 mg ไป 3 Dose,"[""Prescribing Error"", ""Dispensing Error"", ""Administration Error""]"
+2501001123,772814 แพทย์ order ยา metronidazole 300 mg IV ทุก 8 ชั่วโมง พยาบาลให้ dose แรก 500 mg ตามห้องยาเนื่องจากห้องยาคีย์ยาผิด /1410,"[""Transcribing Error"", ""Dispensing Error"", ""Administration Error""]"
+2505000909,แพทย์สั่งยา cefazolin 1 g iv q 6 hr. แต่ห้องยาคีย์ใบ MAR เป็น cefazolin 1 g iv q 8 hr. และจ่ายยาติด Sticker ซองยาเป็น cefazolin 1 g iv q 8 hr.,"[
+  ""Transcribing Error"",
+  ""Predispensing Error"",
+  ""Dispensing Error""
+]"
+2410001012,แพทย์สั่งยา Folic 1 tab po od pc 1 เดือน กลับบ้้าน แต่ห้องยาจ่ายมาแค่ 10 วัน,"[
+  ""Dispensing Error""
+]"
+2509000982,615911 แพทย์มี order meropenam 1 gm q 8 hr ห้องยาไม่จ่ายยามาไม่ครบ,"{
+  ""classification"": ""Dispensing Error""
+}"
+2412000766,1011725 ห้องยาไม่จ่ายยาประจำวันมาให้ ทำให้ต้องประสานเบิกยากับเภสัช ทำให้ผู้ป่วยได้รับยา montek ล่าช้า /1312,"{
+  ""category"": ""Dispensing Error""
+}"
+2501001024,แพทย์มี order NaHCO3(300) 2*2 po และ MgSO4 drip ส่งเบิกยาไปเวลาประมาณ16.30 ได้ยา MgSO4 กลับมาแต่ไม่ได้ยา ์NaHCO3 พยาบาลเวรบ่ายรับยาแต่ไม่ได้ check ยา ผู้ป่วยเลยไม่ได้รับยาNaHCO3 ตามแผนการรักษาในdoseแรก เนื่องจากเภสัชกรไม่ได้จ่ายยาตาม order เวรดึกมารับเวร check ยาซ้ำพบว่าไม่ได้ให้ยาNaHCO3 และห้องยาไม่จ่ายยามา จีงโทรประสานส่ง orderใบจริงไปเบิกใหม่,"[
+  ""Predispensing Error"",
+  ""Dispensing Error"",
+  ""Administration Error""
+]"
+2503001287,993275/แพทย์orderปริมาณยาผิด ผู้ป่วยน้ำหนัก15kg. Orderยา Carbocystein syrup 7ml. po tic pc ตรวจสอบเจอก่อนให้ยากับผู้ป่วย/0410,"{
+  ""Output"": ""Prescribing Error""
+}"
+2502000425,บริเวณหน้าท้องจากการฉีดยา enoxaparin 60 mg sc q 12hr ตน 9 น. มี ecchynosis 2x1 comes ตน.5 น. มี hematoma 8x8 cms ตน. 7 น. มี hematoma 9x8 cms,"[""Administration Error""]"
+2509000475,คนไข้แพ้ยา amlodipine ไม่ใช้ order แพ้ยา,"[""Prescribing Error""]"
+2507000438,แพทย์สั่งยาไม่ตรงกับยาเดิมของผู้ป่วย calcium 1250 mg 1*1 oral pc . เช้า แพทย์สั่ง calcium 1250 mg 1*1 oral pc . เย็น,"[""Prescribing Error""]"
+2504000818,วันที่ 19/4/68 แพทย์สั่งยา simvastatin (20) 1*1 oral hs. แล้วมาสั่งยาชนิดเดียวกัน วันที่ 21/4/68 โดยไม่ได้offยาตัวเก่า สั่งยา Atorvastatin 40 mg 1*1 oral hs.,"{
+  ""classification"": ""Prescribing Error""
+}"
+2509000623,ฉลาก augmentin 1 gm จัด amoxycillin 500 mg,"[""Predispensing Error"", ""Dispensing Error""]"
+2505001058,667205 ฉลากยาระบุ norgesic จำนวน 40 เม็ด แต่มีmetformin ปนมา 10 เม็ด ตรวจพบข้อผิดพลาดที่จุดเช็คยา,"[""Predispensing Error"", ""Dispensing Error""]"
+2411000518,CASE U/D VSD แพทย์สั่ง lasix 3 mg oral bid (5mg/ml) ห้องยาคีย์ ในระบบ เป็น 6 ml คิดคำนวณยาผิด (ผู้ป่วยต้องได้รับ 0.6 ml) ผู้ป่วยได้รับยาเกิน 2 dose,"[
+  ""Transcribing Error"",
+  ""Predispensing Error"",
+  ""Dispensing Error"",
+  ""Administration Error""
+]"
+2508000988,แพทย์สั่ง Gentamicin 240 mg vein OD. ส่งยาไปเบิกห้องยาใน ในsticker ยา เภสัชคีย์เป็น Gentamicin 140 mg vein OD. แต่ได้ Dose ยามาตรงกับ order แพทย์ โทรแจ้งเภสัชให้ Key ในระบบใหม่,"[""Transcribing Error""]"
+2505000649,ไม่ได้ทิ้งยา augmentin ที่ผสมแล้ว โดยเก็บในตู้เย็น แทนที่จะทิ้งยา,"[
+  ""Administration Error""
+]"
+2509000066,683168 case SCLE ก่อนส่ง OR แพทย์สั่ง.ให้ Diazepam ระหว่างรอ ตรวจ ฺBP สูง168/91 mm้Hg ผู้ป่วยกังวลจึงกินยาไปเอง แต่ผู้ป่วยแจ้งว่ากินคลายกังวลไปแล้ว เป็นยา Clonazepam จึงโทรรายงานและแจ้ง OR รับทราบ OFFยา Diazepam,"[""Prescribing Error"", ""Administration Error""]"
+2509000980,"(682523) CASE acute cholecystitis มีU/Dเป็น DM และDLP รับยารพ.ตรังได้แก่ Metformin500 mg 1/2 pc เย็น,simvastatin 20 mg 1tab pc เย็น ซึ่งขณะadmit แพทย์มีorder สั่งยาเดิมรับประทานต่อ แต่เมื่อส่งใบยาเดิมสีฟ้าไปห้องยาใน ไม่ได้ระบุ last doseไว้","[
+  ""Transcribing Error""
+]"
+2509000064,768065 ผู้ป่วยมีประวัติแพ้ยา แต่พริ้นใบลงยา MAR เป็นสีขาว ไม่ได้ใช้สีส้ม,"{
+  ""category"": ""Transcribing Error""
+}"
+2501001010,496597เช็คยาผิดชื่อยา แพทย์สั่่งยา Escitalopam แต่จัด+เช็คผิดเป็นยา Empagliflozin (Jardiance) ตรวจพบความผิดปกติ ณ จุดจ่ายยา,"[""Predispensing Error"", ""Dispensing Error""]"
+2505001004,พบยา Favipiravir อยู่ในช่องยาปกติ ไม่ได้อยู่ในตู้เย็น,"{
+  ""category"": ""Predispensing Error""
+}"

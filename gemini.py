@@ -30,7 +30,7 @@ systemPrompt = """คุณคือเภสัชกรผู้เชีย�
 Input:
 """
 
-df = pd.read_csv('./Assets/Raw-50.csv')
+df = pd.read_csv('./Assets/pilot-raw.csv')
 dataset = df['รายละเอียด'].values     
 codeSet = df['รหัสรายงาน'].values
 
@@ -46,13 +46,13 @@ client = genai.Client()
 
 # 1. Define the Specialist Persona and Rules
 system_prompt = systemPrompt
-counter = 10
-model_name = "gemini-3.5-flash-lite"
+counter = len(df)
+model_name = "gemini-3.1-flash-lite"
 
 def makeRequest():
     ansSet = []
     
-    for i in range(10):
+    for i in range(counter):
         interaction = client.models.generate_content_stream(
             model=model_name,
             contents=[
@@ -71,16 +71,19 @@ def makeRequest():
             fullResp += chunk.text
             print(chunk.text, end="", flush=True)   # live output
             # optionally process chunk here...
-        ansSet.append(fullResp)
+        ansSet.append(str(fullResp))
+        time.sleep(3)
 
+    
     data_export = pd.DataFrame({
         'รหัสรายงาน': codeSet[:counter],
         'รายละเอียด': dataset[:counter],
         'คำตอบ': ansSet
     })
     nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
-    data_export.to_csv(f"Assets/{model_name} + '_' + {nows} + '.csv", index=False, encoding='utf-8-sig')
-    print(f"\nExported to ./Assets/{model_name} + '_' + {nows} + '.csv")
+    #data_export.to_csv(f"Result_log/{model_name} + '_' + {nows} + '.csv", index=False, encoding='utf-8-sig')
+    data_export.to_csv("./Result_log/" + model_name.replace(":", "-") + '_' + nows + '.csv', index=False, encoding='utf-8-sig')
+    print(f"\nExported to ./Result_log/{model_name} + '_' + {nows} + '.csv")
 
 if __name__ == "__main__":
     makeRequest()
