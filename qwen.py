@@ -38,12 +38,13 @@ Input:
 OLLAMA_URL = QWEN_URL
 model_name = QWEN_MODEL
 API_KEY = QWEN_API_KEY
-counter = 3
+
 
 def readFile() -> str:
-    df = pd.read_csv('./Assets/Raw-50.csv')
+    df = pd.read_csv('./Assets/pilot-raw.csv')
     dataset = df['รายละเอียด'].values 
     repcode = df['รหัสรายงาน'].values
+    counter = len(df)
     ansSet = []   
 
     for i in range(counter):
