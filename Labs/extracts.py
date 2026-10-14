@@ -9,8 +9,8 @@ md_path = os.path.join(script_dir, "..", "Prompts", "sys_prompt_v4.md")
 usr_path = os.path.join(script_dir, "..", "Prompts", "user_prompt.md")
 kb_path = os.path.join(script_dir, "..", "Prompts", "CPM_classifier.json")
 
-OLLAMA_URL = "http://192.168.1.120:11434/api/chat"
-model_name = "qwen3:0.6b"
+OLLAMA_URL = "http://localhost:11434/api/chat"
+model_name = "qwen3.5:0.8b"
 
 system_prompt1 = system_prompt2 = ""
 user_prompt1 = user_prompt2 = ""
