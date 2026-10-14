@@ -31,16 +31,18 @@ Input:
 """
 
 # Ollama typically runs on http://localhost:11434
-#OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
-#model_name = "qwen3:0.6b"
+OLLAMA_URL = "http://192.168.1.120:11434/api/generate"
+model_name = "llama3.2:3b"
 
-OLLAMA_URL = LOCAL_OLLAMA_URL
-model_name = LOCAL_OLLAMA_MODEL
-API_KEY = LOCAL_OLLAMA_APIKEY
-counter = 2
+#OLLAMA_URL = LOCAL_OLLAMA_URL
+#model_name = LOCAL_OLLAMA_MODEL
+#API_KEY = LOCAL_OLLAMA_APIKEY
+
 
 def readFile() -> str:
-    df = pd.read_csv('Raw-50.csv')
+    df = pd.read_csv('./Assets/pilot-raw.csv')
+    counter = len(df)
+    #counter = 2
     dataset = df['รายละเอียด'].values 
     repcode = df['รหัสรายงาน'].values
     ansSet = []   
@@ -50,12 +52,13 @@ def readFile() -> str:
         result = AskOllama(system_prompt + dataset[i] + "\nOutput:")
         ansSet.append(result)
         print(result)
+        time.sleep(2.5)
 
     nows = datetime.fromtimestamp(time.time()).strftime("%y%m%d_%H%M%S")
     df_set = pd.DataFrame({
         'รหัสรายงาน' : repcode[:counter],
         'รายละเอียด' : dataset[:counter],
-        'คำตอบ' : ansSet
+        'คำตอบ' : str(ansSet)
     })
     df_set.to_csv(model_name.replace(":", "-") + '_' + nows + '.csv', index=False, encoding='utf-8-sig')
     print('Exported to '+ model_name.replace(":", "-") + '_' + nows + '.csv')
@@ -67,7 +70,7 @@ def generate_ollama(prompt: str) -> str:
         "model": model_name,
         "prompt": prompt,
         "stream": True,          # we want a streaming response like OpenAI
-        "max_tokens": 2048,       # optional – adjust as needed
+        "max_tokens": 4096,       # optional – adjust as needed
         "think": False
     }
 
@@ -93,7 +96,7 @@ def AskOllama(prompt: str) -> str:
     payload = {
         "model": model_name,
         "prompt": prompt,
-        "max_tokens": 2048,
+        "max_tokens": 4096,
         "think": False,
         "stream": False
     }

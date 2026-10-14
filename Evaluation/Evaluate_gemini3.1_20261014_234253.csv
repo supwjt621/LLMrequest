@@ -1,0 +1,38 @@
+﻿รหัสรายงาน,result,model,precision,recall,f1-score
+2507000441,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2509000086,Dispensing Error,"Predispensing Error, Dispensing Error",0.50,1.00,0.67
+2507001027,Transcribing Error,"Transcribing Error, Dispensing Error",0.50,1.00,0.67
+2507000580,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2507000418,"Prescribing Error, Transcribing Error, Dispensing Error","Prescribing Error, Transcribing Error, Dispensing Error",1.00,1.00,1.00
+2504000187,"Prescribing Error, Dispensing Error","Prescribing Error, Transcribing Error",0.50,0.50,0.50
+2504001013,Administration Error,"Prescribing Error, Administration Error",0.50,1.00,0.67
+2103000779,Dispensing Error,"Prescribing Error, Dispensing Error",0.50,1.00,0.67
+2509000808,Predispensing Error,"Predispensing Error, Dispensing Error",0.50,1.00,0.67
+2505000954,Prescribing Error,"Transcribing Error, Predispensing Error, Dispensing Error",0.00,0.00,0.00
+2507000571,"Transcribing Error, Dispensing Error","Transcribing Error, Dispensing Error",1.00,1.00,1.00
+2508000237,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2504000988,Administration Error,"Prescribing Error, Transcribing Error, Dispensing Error, Administration Error",0.25,1.00,0.40
+2412000818,"Dispensing Error, Administration Error","Prescribing Error, Dispensing Error, Administration Error",0.67,1.00,0.80
+2501001123,"Dispensing Error, Administration Error","Transcribing Error, Dispensing Error, Administration Error",0.67,1.00,0.80
+2505000909,Dispensing Error,"Transcribing Error, Predispensing Error, Dispensing Error",0.33,1.00,0.50
+2410001012,Dispensing Error,Dispensing Error,1.00,1.00,1.00
+2509000982,Dispensing Error,Dispensing Error,1.00,1.00,1.00
+2412000766,Dispensing Error,Dispensing Error,1.00,1.00,1.00
+2501001024,"Dispensing Error, Administration Error","Predispensing Error, Dispensing Error, Administration Error",0.67,1.00,0.80
+2503001287,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2502000425,Administration Error,Administration Error,1.00,1.00,1.00
+2509000475,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2507000438,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2504000818,Prescribing Error,Prescribing Error,1.00,1.00,1.00
+2509000623,Predispensing Error,"Predispensing Error, Dispensing Error",0.50,1.00,0.67
+2505001058,Predispensing Error,"Predispensing Error, Dispensing Error",0.50,1.00,0.67
+2411000518,"Dispensing Error, Administration Error","Transcribing Error, Predispensing Error, Dispensing Error, Administration Error",0.50,1.00,0.67
+2508000988,Transcribing Error,Transcribing Error,1.00,1.00,1.00
+2505000649,Administration Error,Administration Error,1.00,1.00,1.00
+2509000066,Prescribing Error,"Prescribing Error, Administration Error",0.50,1.00,0.67
+2509000980,Prescribing Error,Transcribing Error,0.00,0.00,0.00
+2509000064,Unclassified,Transcribing Error,0.00,0.00,0.00
+2501001010,Predispensing Error,"Predispensing Error, Dispensing Error",0.50,1.00,0.67
+2505001004,Predispensing Error,Predispensing Error,1.00,1.00,1.00
+Overall (Observed),,,0.6881,0.9000,0.7562
+95% Bootstrap CI,,,"[0.5833, 0.7952]","[0.8000, 0.9857]","[0.6514, 0.8505]"
