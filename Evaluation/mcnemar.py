@@ -3,7 +3,8 @@ from datetime import datetime
 from statsmodels.stats.contingency_tables import mcnemar
 
 # 1. อ่านไฟล์ CSV
-df = pd.read_csv('gemini3.1-flash.csv')
+fileName = 'qwen3.8-max_test.csv'
+df = pd.read_csv(fileName)
 
 # กำหนดรายชื่อ Label ทั้งหมดตามโจทย์
 labels = [
@@ -56,11 +57,14 @@ res_df = pd.DataFrame(results_list)
 # แสดงผลลัพธ์ทางหน้าจอ
 print(res_df.to_markdown(index=False))
 
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
 # 4. Export ผลลัพธ์ออกเป็นไฟล์ Markdown (.md)
 markdown_text = res_df.to_markdown(index=False)
-with open('mcnemar_summary_results.md', 'w', encoding='utf-8') as f:
-    f.write("# McNemar Test Summary Results\n\n")
+with open('mcnemar_test_'+ fileName + '_' + timestamp +'.md', 'w', encoding='utf-8') as f:
+    f.write("# McNemar Test Summary Results\n")
+    f.write("fileName: " + fileName + "\n\n")
     f.write(markdown_text)
 
-timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-print("\nบันทึกไฟล์สรุปผลเป็น 'mcnemar_result_"+ timestamp +".md' เรียบร้อยแล้ว")
+
+print("\nบันทึกไฟล์สรุปผลเป็น 'mcnemar_test_"+ timestamp +".md' เรียบร้อยแล้ว")
