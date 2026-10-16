@@ -98,3 +98,28 @@ filename = f'Evaluate_{filename}_{timestamp}.csv'
 df_export.to_csv(filename, index=False, encoding='utf-8-sig')
 
 print(f"Successfully exported evaluation results with bootstrap stats to: {filename}")
+
+# 9. Export to markdown file
+base_name = filename.replace('.csv', '')
+md_filename = f'{base_name}_md_{timestamp}.md'
+markdown_content = f"""# Evaluation Results - {base_name}
+
+## Sample Metrics
+| Metric | Value |
+|--------|-------|
+| Overall Precision | {overall_p:.4f} |
+| Overall Recall | {overall_r:.4f} |
+| Overall F1-score | {overall_f:.4f} |
+
+## Bootstrap Confidence Intervals (95%)
+| Metric | Lower CI | Upper CI |
+|--------|----------|----------|
+| Precision | {p_low:.4f} | {p_high:.4f} |
+| Recall | {r_low:.4f} | {r_high:.4f} |
+| F1-score | {f1_low:.4f} | {f1_high:.4f} |
+"""
+
+with open(md_filename, 'w', encoding='utf-8') as f:
+    f.write(markdown_content)
+
+print(f"Successfully exported evaluation results to markdown file: {md_filename}")
