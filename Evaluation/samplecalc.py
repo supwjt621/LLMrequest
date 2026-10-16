@@ -4,6 +4,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from scipy.stats import norm
 import os
 from datetime import datetime
+#ref: https://www.medcalc.org/en/manual/sample-size-mcnemar-test.php?utm_source=chatgpt.com
 
 # 1. โหลดข้อมูลจากไฟล์ CSV
 fileName = 'qwen3.8-max_test.csv'
