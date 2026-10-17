@@ -23,7 +23,7 @@ N_BOOTSTRAP = 1000
 CONFIDENCE = 0.95
 SEED = 42
 
-input_name = 'gemini3.1-flash'
+input_name = 'qwen3.8-max_261017_135107'
 
 # ---------------------------------------------------------------
 # 1. Read CSV
