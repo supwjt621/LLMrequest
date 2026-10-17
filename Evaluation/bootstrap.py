@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime
 from scipy.stats import bootstrap
 from sklearn.metrics import multilabel_confusion_matrix, precision_recall_fscore_support
+from statsmodels.stats.contingency_tables import mcnemar
 from sklearn.preprocessing import MultiLabelBinarizer
 
 # ---------------------------------------------------------------
@@ -131,16 +132,18 @@ summary_row = {
     'true positive': int(cm[:, 1, 1].sum()),
     'false positive': int(cm[:, 0, 1].sum()),
     'false negative': int(cm[:, 1, 0].sum()),
+    'true negative': int(cm[:, 0, 0].sum()),
     'precision': overall_p, 'recall': overall_r, 'f1-score': overall_f,
 }
 ci_row = {
     'รหัสรายงาน': '95% Bootstrap CI',
     'result': '', 'model': '',
-    'true positive': '', 'false positive': '', 'false negative': '',
+    'true positive': '', 'false positive': '', 'false negative': '', 'true negative': '',
     'precision': f"[{p_low:.4f}, {p_high:.4f}]",
     'recall': f"[{r_low:.4f}, {r_high:.4f}]",
     'f1-score': f"[{f1_low:.4f}, {f1_high:.4f}]",
 }
+df_rows = df_export.copy()  # ตารางรายแถวล้วน (ไม่รวมแถวสรุป) ไว้ใช้ใน markdown
 df_export = pd.concat([df_export, pd.DataFrame([summary_row, ci_row])], ignore_index=True)
 
 # ---------------------------------------------------------------
@@ -148,15 +151,57 @@ df_export = pd.concat([df_export, pd.DataFrame([summary_row, ci_row])], ignore_i
 # ---------------------------------------------------------------
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 base_name = f'Evaluate_{input_name}_{timestamp}'
+"""
 csv_filename = base_name + '.csv'
 df_export.to_csv(csv_filename, index=False, encoding='utf-8-sig')
 print(f"Exported CSV: {csv_filename}")
-
+"""
 # ---------------------------------------------------------------
 # 9. Export Markdown
 # ---------------------------------------------------------------
 md_filename = base_name + '.md'
+def to_md_table(d):
+    cols = list(d.columns)
+    lines = [
+        '| ' + ' | '.join(cols) + ' |',
+        '|' + '|'.join(['---'] * len(cols)) + '|',
+    ]
+    for _, r in d.iterrows():
+        cells = []
+        for c in cols:
+            v = r[c]
+            if isinstance(v, (float, np.floating)):
+                cells.append(f'{v:.4f}')
+            else:
+                cells.append(str(v).replace('|', '\\|'))
+        lines.append('| ' + ' | '.join(cells) + ' |')
+    return '\n'.join(lines)
+
+
+rows_table_md = to_md_table(df_rows)
+
+# McNemar Test รายละ label (Ground Truth vs Model Prediction)
+# cm_label[j] = [[TN, FP], [FN, TP]] โดยแถว = Ground Truth, คอลัมน์ = Model Prediction
+# (ตรงกับตาราง 2x2 จาก pd.crosstab ในโค้ด mcnemar.py เดิม)
+cm_label = multilabel_confusion_matrix(y_true, y_pred)
+mcnemar_lines = [
+    '| Label | TP | FP | FN | TN | p-value | statistic [min(FP,FN)] |',
+    '|---|---|---|---|---|---|---|',
+]
+print("McNemar Test (exact=True)")
+for label, table in zip(LABELS, cm_label):
+    res = mcnemar(table, exact=True)
+    tn, fp, fn, tp = table.ravel()
+    mcnemar_lines.append(
+        f'| {label} | {tp} | {fp} | {fn} | {tn} | {res.pvalue:.4f} | {res.statistic:g} |'
+    )
+    print(f"  {label}: p-value={res.pvalue:.4f}, statistic={res.statistic:g}")
+mcnemar_table_md = '\n'.join(mcnemar_lines)
+
 markdown_content = f"""# Evaluation Results - {input_name}
+
+## Per-report Results (n={len(df_rows)})
+{rows_table_md}
 
 ## Sample-average Metrics
 | Metric | Value |
@@ -171,6 +216,11 @@ markdown_content = f"""# Evaluation Results - {input_name}
 | Precision | {p_low:.4f} | {p_high:.4f} |
 | Recall | {r_low:.4f} | {r_high:.4f} |
 | F1-score | {f1_low:.4f} | {f1_high:.4f} |
+
+## McNemar Test Summary Results
+fileName: {input_name}.csv
+
+{mcnemar_table_md}
 """
 with open(md_filename, 'w', encoding='utf-8') as f:
     f.write(markdown_content)
