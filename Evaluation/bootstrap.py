@@ -1,125 +1,177 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from datetime import datetime
-from sklearn.metrics import precision_score, recall_score, f1_score
+from scipy.stats import bootstrap
+from sklearn.metrics import multilabel_confusion_matrix, precision_recall_fscore_support
 from sklearn.preprocessing import MultiLabelBinarizer
 
-# 1. Read the CSV file
-filename = 'qwen3.8-max_test'
-df = pd.read_csv(filename + '.csv')
+# ---------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------
+LABELS = [
+    'Prescribing Error',
+    'Transcribing Error',
+    'Predispensing Error',
+    'Dispensing Error',
+    'Administration Error',
+    'Unclassified',
+]
+CANON = {l.lower(): l for l in LABELS}  # ใช้ normalize ตัวพิมพ์เล็ก/ใหญ่
 
-# 2. Preprocess comma-separated text into lists of labels
-y_true_lists = df['result'].apply(lambda x: [s.strip() for s in str(x).split(',')])
-y_pred_lists = df['model'].apply(lambda x: [s.strip() for s in str(x).split(',')])
+N_BOOTSTRAP = 1000
+CONFIDENCE = 0.95
+SEED = 42
 
-# 3. Binarize labels into a multilabel indicator matrix
-mlb = MultiLabelBinarizer()
+input_name = 'gemini3.1-flash'
+
+# ---------------------------------------------------------------
+# 1. Read CSV
+# ---------------------------------------------------------------
+df = pd.read_csv(input_name + '.csv')
+
+
+# ---------------------------------------------------------------
+# 2. แปลงข้อความ (คั่นด้วย comma) เป็น list ของ label
+# ---------------------------------------------------------------
+def to_labels(x):
+    if pd.isna(x):
+        return []
+    out = []
+    for s in str(x).split(','):
+        s = s.strip()
+        if not s:
+            continue
+        if s.lower() not in CANON:
+            print(f"[WARNING] พบ label ที่ไม่รู้จัก: '{s}' (จะถูกข้าม)")
+            continue
+        out.append(CANON[s.lower()])
+    return out
+
+
+y_true_lists = df['result'].apply(to_labels)
+y_pred_lists = df['model'].apply(to_labels)
+
+# ---------------------------------------------------------------
+# 3. Binarize โดยกำหนด classes ตายตัว 6 label
+#    (ไม่ fit จากข้อมูล เพื่อให้คอลัมน์คงที่ แม้บาง class จะไม่เจอใน ground truth)
+# ---------------------------------------------------------------
+mlb = MultiLabelBinarizer(classes=LABELS)
 y_true = mlb.fit_transform(y_true_lists)
 y_pred = mlb.transform(y_pred_lists)
 
-# 4. Calculate row-wise (per-sample) metrics for the dataframe export
-row_precisions = []
-row_recalls = []
-row_f1s = []
+# ---------------------------------------------------------------
+# 4. Metrics รายแถว (per-sample)
+# ---------------------------------------------------------------
+row_scores = np.array([
+    precision_recall_fscore_support(
+        y_true[i:i + 1], y_pred[i:i + 1],
+        average='samples', zero_division=0
+    )[:3]
+    for i in range(len(y_true))
+])  # shape (n_samples, 3)
 
-for i in range(len(y_true)):
-    p = precision_score(y_true[i:i+1], y_pred[i:i+1], average="samples", zero_division=0)
-    r = recall_score(y_true[i:i+1], y_pred[i:i+1], average="samples", zero_division=0)
-    f = f1_score(y_true[i:i+1], y_pred[i:i+1], average="samples", zero_division=0)
-    row_precisions.append(p)
-    row_recalls.append(r)
-    row_f1s.append(f)
+# TP / FP / FN รายแถว (นับรวมทุก label ในแถวนั้น)
+# samplewise=True -> ได้ confusion matrix 2x2 ต่อแถว: [[TN, FP], [FN, TP]]
+cm = multilabel_confusion_matrix(y_true, y_pred, samplewise=True)
+df['true positive'] = cm[:, 1, 1]
+df['false positive'] = cm[:, 0, 1]
+df['false negative'] = cm[:, 1, 0]
+df['true negative'] = cm[:, 0, 0]
 
-df['precision'] = row_precisions
-df['recall'] = row_recalls
-df['f1-score'] = row_f1s
+df['precision'] = row_scores[:, 0]
+df['recall'] = row_scores[:, 1]
+df['f1-score'] = row_scores[:, 2]
 
-# Keep only the requested columns
-df_export = df[['รหัสรายงาน', 'result', 'model', 'precision', 'recall', 'f1-score']].copy()
+df_export = df[[
+    'รหัสรายงาน', 'result', 'model',
+    'true positive', 'false positive', 'false negative', 'true negative',
+    'precision', 'recall', 'f1-score',
+]].copy()
 
-# 5. Calculate overall sample-average dataset metrics
-overall_p = precision_score(y_true, y_pred, average="samples", zero_division=0)
-overall_r = recall_score(y_true, y_pred, average="samples", zero_division=0)
-overall_f = f1_score(y_true, y_pred, average="samples", zero_division=0)
+# ---------------------------------------------------------------
+# 5. Sample-average metrics ทั้งชุดข้อมูล
+# ---------------------------------------------------------------
+overall_p, overall_r, overall_f, _ = precision_recall_fscore_support(
+    y_true, y_pred, average='samples', zero_division=0
+)
 
-# 6. Perform Bootstrapping to get 95% Confidence Intervals
-n_bootstrap = 1000
-n_samples = len(y_true)
-bootstrap_f1 = []
-bootstrap_p = []
-bootstrap_r = []
+# sample-average = ค่าเฉลี่ยของ metric รายแถว -> ตรวจสอบความสอดคล้อง
+assert np.isclose(overall_f, row_scores[:, 2].mean())
 
-np.random.seed(42) # Set seed for reproducibility
-for _ in range(n_bootstrap):
-    idx = np.random.choice(n_samples, size=n_samples, replace=True)
-    
-    bootstrap_f1.append(f1_score(y_true[idx], y_pred[idx], average="samples", zero_division=0))
-    bootstrap_p.append(precision_score(y_true[idx], y_pred[idx], average="samples", zero_division=0))
-    bootstrap_r.append(recall_score(y_true[idx], y_pred[idx], average="samples", zero_division=0))
+# ---------------------------------------------------------------
+# 6. Bootstrap 95% CI (percentile) ด้วย scipy.stats.bootstrap
+#    resample "แถว" แล้วหาค่าเฉลี่ยของ metric รายแถว
+#    ซึ่งเท่ากับการคำนวณ sample-average ใหม่ในแต่ละรอบ แต่เร็วกว่ามาก
+# ---------------------------------------------------------------
+def boot_ci(values):
+    res = bootstrap(
+        (values,), np.mean,
+        n_resamples=N_BOOTSTRAP,
+        confidence_level=CONFIDENCE,
+        method='percentile',
+        random_state=SEED,
+    )
+    return res.confidence_interval.low, res.confidence_interval.high
 
-bootstrap_f1 = np.array(bootstrap_f1)
-bootstrap_p = np.array(bootstrap_p)
-bootstrap_r = np.array(bootstrap_r)
 
-# Percentile Confidence Intervals (95%)
-f1_low, f1_high = np.percentile(bootstrap_f1, [2.5, 97.5])
-p_low, p_high = np.percentile(bootstrap_p, [2.5, 97.5])
-r_low, r_high = np.percentile(bootstrap_r, [2.5, 97.5])
+p_low, p_high = boot_ci(row_scores[:, 0])
+r_low, r_high = boot_ci(row_scores[:, 1])
+f1_low, f1_high = boot_ci(row_scores[:, 2])
 
-# Print stats to console
-print(f"Observed Sample-average F1: {overall_f:.4f}")
-print(f"95% Bootstrap CI: [{f1_low:.4f}, {f1_high:.4f}]\n")
+print(f"Sample-average Precision: {overall_p:.4f}  95% CI [{p_low:.4f}, {p_high:.4f}]")
+print(f"Sample-average Recall:    {overall_r:.4f}  95% CI [{r_low:.4f}, {r_high:.4f}]")
+print(f"Sample-average F1:        {overall_f:.4f}  95% CI [{f1_low:.4f}, {f1_high:.4f}]\n")
 
-# 7. Format summary rows to include at the bottom of the CSV
+# ---------------------------------------------------------------
+# 7. สรุปท้ายตาราง CSV
+# ---------------------------------------------------------------
 summary_row = {
     'รหัสรายงาน': 'Overall (Observed)',
-    'result': '',
-    'model': '',
-    'precision': overall_p,
-    'recall': overall_r,
-    'f1-score': overall_f
+    'result': '', 'model': '',
+    'true positive': int(cm[:, 1, 1].sum()),
+    'false positive': int(cm[:, 0, 1].sum()),
+    'false negative': int(cm[:, 1, 0].sum()),
+    'precision': overall_p, 'recall': overall_r, 'f1-score': overall_f,
 }
-
 ci_row = {
     'รหัสรายงาน': '95% Bootstrap CI',
-    'result': '',
-    'model': '',
+    'result': '', 'model': '',
+    'true positive': '', 'false positive': '', 'false negative': '',
     'precision': f"[{p_low:.4f}, {p_high:.4f}]",
     'recall': f"[{r_low:.4f}, {r_high:.4f}]",
-    'f1-score': f"[{f1_low:.4f}, {f1_high:.4f}]"
+    'f1-score': f"[{f1_low:.4f}, {f1_high:.4f}]",
 }
-
-# Append summary rows to export dataframe
 df_export = pd.concat([df_export, pd.DataFrame([summary_row, ci_row])], ignore_index=True)
 
-# 8. Export to timestamped CSV file
+# ---------------------------------------------------------------
+# 8. Export CSV
+# ---------------------------------------------------------------
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-filename = f'Evaluate_{filename}_{timestamp}.csv'
-df_export.to_csv(filename, index=False, encoding='utf-8-sig')
+base_name = f'Evaluate_{input_name}_{timestamp}'
+csv_filename = base_name + '.csv'
+df_export.to_csv(csv_filename, index=False, encoding='utf-8-sig')
+print(f"Exported CSV: {csv_filename}")
 
-print(f"Successfully exported evaluation results with bootstrap stats to: {filename}")
+# ---------------------------------------------------------------
+# 9. Export Markdown
+# ---------------------------------------------------------------
+md_filename = base_name + '.md'
+markdown_content = f"""# Evaluation Results - {input_name}
 
-# 9. Export to markdown file
-base_name = filename.replace('.csv', '')
-md_filename = f'{base_name}_md_{timestamp}.md'
-markdown_content = f"""# Evaluation Results - {base_name}
-
-## Sample Metrics
+## Sample-average Metrics
 | Metric | Value |
 |--------|-------|
-| Overall Precision | {overall_p:.4f} |
-| Overall Recall | {overall_r:.4f} |
-| Overall F1-score | {overall_f:.4f} |
+| Precision | {overall_p:.4f} |
+| Recall | {overall_r:.4f} |
+| F1-score | {overall_f:.4f} |
 
-## Bootstrap Confidence Intervals (95%)
+## Bootstrap Confidence Intervals ({int(CONFIDENCE * 100)}%, n={N_BOOTSTRAP})
 | Metric | Lower CI | Upper CI |
 |--------|----------|----------|
 | Precision | {p_low:.4f} | {p_high:.4f} |
 | Recall | {r_low:.4f} | {r_high:.4f} |
 | F1-score | {f1_low:.4f} | {f1_high:.4f} |
 """
-
 with open(md_filename, 'w', encoding='utf-8') as f:
     f.write(markdown_content)
-
-print(f"Successfully exported evaluation results to markdown file: {md_filename}")
+print(f"Exported Markdown: {md_filename}")
